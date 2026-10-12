@@ -23,7 +23,7 @@ Interactive security questions, account recovery guidance, possible causes of se
 We assume users need simple instructions to understand security problems and protect their online accounts.
 
 7.What will be included in your MVP?
-A security questionnaire, account recovery checklists, and guidance on important security settings.
+The security Assesment, account recovery checklists, and guidance on important security settings.
 
 8.What will NOT be included in the MVP?
 
