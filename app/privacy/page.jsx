@@ -1,0 +1,5 @@
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { privacyRecommendations } from '../../src/data/privacyRecommendations';
+import PrivacySettingCard from '../../src/components/PrivacySettingCard';
+export default function PrivacyPage() { return <div className="page-shell"><div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><span>Privacy recommendations</span></div><div className="page-intro"><span className="eyebrow">YOUR SETTINGS, YOUR CHOICE</span><h1>Keep your account<br /><span>closer to you.</span></h1><p>A few regular checks can help you decide what information you share and who can access your accounts.</p></div><div className="privacy-grid">{privacyRecommendations.map((item, i) => <PrivacySettingCard item={item} index={i} key={item.title} />)}</div><section className="next-step-panel"><div><span className="eyebrow">TAKE THE NEXT STEP</span><h2>Want a personalized starting point?</h2><p>Answer four questions to get an action plan based on your security habits.</p></div><Link href="/assessment" className="button button-primary">Take the assessment <ArrowRight size={17} /></Link></section></div>; }

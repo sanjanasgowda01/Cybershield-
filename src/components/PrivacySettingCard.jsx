@@ -1,0 +1,3 @@
+import { Blocks, Eye, Fingerprint, MonitorSmartphone } from 'lucide-react';
+const icons = { Fingerprint, Eye, MonitorSmartphone, Blocks };
+export default function PrivacySettingCard({ item, index }) { const Icon = icons[item.icon]; return <article className="content-card privacy-card"><div className="privacy-head"><span className="icon-box"><Icon size={21} /></span><span className="eyebrow">SETTING 0{index + 1}</span></div><h2>{item.title}</h2><p>{item.explanation}</p><div className="why-box"><strong>Why it matters</strong><p>{item.why}</p></div><h3>What you can do</h3><ul>{item.actions.map((x) => <li key={x}>{x}</li>)}</ul></article>; }
