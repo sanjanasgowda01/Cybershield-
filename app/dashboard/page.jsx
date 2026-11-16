@@ -7,5 +7,98 @@ import { assessmentQuestions } from '../../src/data/assessmentQuestions';
 import { resultLabel } from '../../src/data/dashboardData';
 import RecommendationCard from '../../src/components/RecommendationCard';
 import ProgressBar from '../../src/components/ProgressBar';
-const Icon = ({ answer }) => answer === 'Yes' ? <BadgeCheck className="success" size={18} /> : answer === 'No' ? <CircleX className="danger" size={18} /> : <CircleHelp className="warning" size={18} />;
-export default function DashboardPage() { const router = useRouter(); const { answers, assessmentComplete, score, retakeAssessment } = useCyberShield(); const answered = assessmentQuestions.filter((q) => answers[q.id]).length; const recommendations = assessmentQuestions.filter((q) => answers[q.id] !== 'Yes').map((q) => ({ title: q.recommendation, description: q.question })); const startOver = () => { retakeAssessment(); router.push('/assessment'); }; return <div className="page-shell"><div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><span>Your results</span></div><div className="page-intro"><span className="eyebrow">YOUR PERSONAL SECURITY SNAPSHOT</span><h1>Your next steps, <span>made simple.</span></h1><p>A summary based on your answers. Only you know the details of your accounts; use this as a practical guide.</p></div>{!assessmentComplete && <div className="notice-banner"><CircleHelp size={19} /><span>You haven’t completed the assessment yet. <Link href="/assessment">Start the four-question check-in →</Link></span></div>}<div className="dashboard-grid"><section className="score-panel"><div className="score-top"><div><span className="eyebrow">ASSESSMENT STATUS</span><h2>{assessmentComplete ? resultLabel(score) : 'Not completed yet'}</h2></div><span className="score-icon"><ShieldCheck size={23} /></span></div><p>{assessmentComplete ? 'Your answers suggest some good habits and a few opportunities to add protection.' : 'Complete the assessment to see your personalized account safety summary.'}</p><div className="score-metrics"><div><strong>{answered}<small> / 4</small></strong><span>Questions answered</span></div><div><strong>{assessmentComplete ? score : '—'}<small> / 4</small></strong><span>Protective habits</span></div></div><ProgressBar value={Math.round(answered / 4 * 100)} label="Assessment completion" /><button className="text-button" onClick={startOver}><RotateCcw size={15} /> Retake assessment</button></section><section className="answer-panel"><span className="eyebrow">YOUR ANSWERS</span><h2>Assessment summary</h2>{assessmentQuestions.map((q) => <div className="answer-summary" key={q.id}><span>{q.question}</span><strong className={`answer-${(answers[q.id] || 'unanswered').toLowerCase().replace(' ', '-')}`}><Icon answer={answers[q.id]} />{answers[q.id] || 'Not answered'}</strong></div>)}</section></div><section className="recommend-section"><div className="section-heading"><div><span className="eyebrow">YOUR ACTION PLAN</span><h2>Start with these actions.</h2></div><p>Focus on the areas where you answered “No” or “Not sure.”</p></div>{recommendations.length ? <div className="recommend-list">{recommendations.map((item, i) => <RecommendationCard item={item} index={i} key={item.title} />)}</div> : <div className="complete-banner"><span className="success-dot"><BadgeCheck size={16} /></span><div><strong>Great work—your answers show four strong habits.</strong><p>Keep reviewing these settings as your accounts and devices change.</p></div></div>}</section><section className="resource-grid"><Link className="resource-tile" href="/recovery"><span className="eyebrow">NEED ACCESS BACK?</span><strong>Account recovery guide</strong><span>Go step by step <ArrowRight size={15} /></span></Link><Link className="resource-tile" href="/privacy"><span className="eyebrow">TIGHTEN YOUR SETTINGS</span><strong>Privacy recommendations</strong><span>Review your controls <ArrowRight size={15} /></span></Link><Link className="resource-tile" href="/incidents"><span className="eyebrow">LEARN THE WARNING SIGNS</span><strong>Common security risks</strong><span>Explore the guides <ArrowRight size={15} /></span></Link></section></div>; }
+
+const Icon = ({ answer }) => answer === 'Yes'
+  ? <BadgeCheck className="success" size={18} />
+  : answer === 'No'
+    ? <CircleX className="danger" size={18} />
+    : <CircleHelp className="warning" size={18} />;
+
+const guidanceLink = (questionId) => questionId === 'uniquePassword' ? '/incidents' : '/privacy';
+
+export default function DashboardPage() {
+  const router = useRouter();
+  const { answers, assessmentComplete, score, retakeAssessment } = useCyberShield();
+  const answered = assessmentQuestions.filter((q) => answers[q.id]).length;
+  const recommendations = assessmentQuestions
+    .filter((question) => answers[question.id] === 'No' || answers[question.id] === 'Not sure')
+    .map((question) => ({
+      title: question.id === 'uniquePassword'
+        ? 'Use a different strong password for each important account.'
+        : question.id === 'twoFactor'
+          ? 'Enable two-factor authentication on important accounts.'
+          : question.id === 'sessions'
+            ? 'Review active sessions and sign out of devices you do not recognize.'
+            : 'Review privacy settings and remove app permissions you no longer need.',
+      description: question.recommendation,
+      priority: answers[question.id] === 'No' ? 'High' : 'Medium',
+      href: guidanceLink(question.id),
+    }));
+  const startOver = () => { retakeAssessment(); router.push('/assessment'); };
+
+  return (
+    <div className="page-shell">
+      <div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><span>Your results</span></div>
+      <div className="page-intro">
+        <span className="eyebrow">YOUR PERSONAL SECURITY SNAPSHOT</span>
+        <h1>Your next steps, <span>made simple.</span></h1>
+        <p>A summary based on your answers. Only you know the details of your accounts; use this as a practical guide.</p>
+      </div>
+
+      {!assessmentComplete ? (
+        <section className="dashboard-empty" aria-labelledby="empty-dashboard-title">
+          <CircleHelp size={25} />
+          <h2 id="empty-dashboard-title">Your results are not ready yet.</h2>
+          <p>Complete all four assessment questions to see your answers and recommendations here.</p>
+          <Link className="button button-primary" href="/assessment">Start the assessment <ArrowRight size={16} /></Link>
+        </section>
+      ) : (
+        <>
+          <div className="dashboard-grid">
+            <section className="score-panel">
+              <div className="score-top">
+                <div><span className="eyebrow">ASSESSMENT STATUS</span><h2>{resultLabel(score)}</h2></div>
+                <span className="score-icon"><ShieldCheck size={23} /></span>
+              </div>
+              <p>Your answers suggest some good habits and a few opportunities to add protection.</p>
+              <div className="score-metrics">
+                <div><strong>{answered}<small> / 4</small></strong><span>Questions answered</span></div>
+                <div><strong>{score}<small> / 4</small></strong><span>Protective habits</span></div>
+              </div>
+              <ProgressBar value={Math.round(answered / 4 * 100)} label="Assessment completion" />
+              <button className="text-button" onClick={startOver}><RotateCcw size={15} /> Retake assessment</button>
+            </section>
+            <section className="answer-panel">
+              <span className="eyebrow">YOUR ANSWERS</span>
+              <h2>Assessment summary</h2>
+              {assessmentQuestions.map((question) => (
+                <div className="answer-summary" key={question.id}>
+                  <span>{question.question}</span>
+                  <strong className={`answer-${(answers[question.id] || 'unanswered').toLowerCase().replace(' ', '-')}`}>
+                    <Icon answer={answers[question.id]} />{answers[question.id]}
+                  </strong>
+                </div>
+              ))}
+            </section>
+          </div>
+          <section className="recommend-section">
+            <div className="section-heading">
+              <div><span className="eyebrow">YOUR ACTION PLAN</span><h2>Start with these actions.</h2></div>
+              <p>“No” answers receive high priority. “Not sure” answers receive medium priority.</p>
+            </div>
+            {recommendations.length ? (
+              <div className="recommend-list">{recommendations.map((item, index) => <RecommendationCard item={item} index={index} key={item.title} />)}</div>
+            ) : (
+              <div className="complete-banner"><span className="success-dot"><BadgeCheck size={16} /></span><div><strong>Great work—your answers show four strong habits.</strong><p>Keep reviewing these settings as your accounts and devices change.</p></div></div>
+            )}
+          </section>
+          <section className="resource-grid">
+            <Link className="resource-tile" href="/recovery"><span className="eyebrow">NEED ACCESS BACK?</span><strong>Account recovery guide</strong><span>Go step by step <ArrowRight size={15} /></span></Link>
+            <Link className="resource-tile" href="/privacy"><span className="eyebrow">TIGHTEN YOUR SETTINGS</span><strong>Privacy recommendations</strong><span>Review your controls <ArrowRight size={15} /></span></Link>
+            <Link className="resource-tile" href="/incidents"><span className="eyebrow">LEARN THE WARNING SIGNS</span><strong>Common security risks</strong><span>Explore the guides <ArrowRight size={15} /></span></Link>
+          </section>
+        </>
+      )}
+    </div>
+  );
+}
