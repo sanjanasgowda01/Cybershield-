@@ -1,0 +1,3 @@
+import { CopyCheck, Fingerprint, KeyRound, MailWarning } from 'lucide-react';
+const icons = { MailWarning, KeyRound, CopyCheck, Fingerprint };
+export default function IncidentCard({ item }) { const Icon = icons[item.icon]; return <article className="content-card incident-card"><span className={`icon-box tone-${item.tone}`}><Icon size={21} /></span><h2>{item.title}</h2><p>{item.meaning}</p><h3>Warning signs</h3><ul>{item.signs.map((x) => <li key={x}>{x}</li>)}</ul><h3>Why it matters</h3><p>{item.why}</p><h3>How to prevent it</h3><ul>{item.prevent.map((x) => <li key={x}>{x}</li>)}</ul></article>; }
