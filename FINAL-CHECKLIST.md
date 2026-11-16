@@ -34,6 +34,8 @@ Statuses reflect only work verified in this checkout. GitHub confirms issues #1â
 | No console errors | PENDING (browser verification pending) |
 | Lint passed | COMPLETE (`npm run lint`) |
 | Production build passed | COMPLETE (`npm run build`, Next.js 16.4.6) |
+| Production dependency audit | COMPLETE (0 vulnerabilities) |
+| Development dependency audit | PENDING (7 moderate `minimatch` advisories in the ESLint TypeScript toolchain; compatible audit fix unavailable) |
 | Issue #1 completed | COMPLETE (verified implementation pushed) |
 | Issue #2 completed | COMPLETE (verified implementation pushed) |
 | Issue #3 completed | COMPLETE (verified implementation pushed) |
@@ -62,3 +64,4 @@ Statuses reflect only work verified in this checkout. GitHub confirms issues #1â
 - The requested dynamic results view is included to connect the assessment flow; teammate issues #7â€“#11 were not closed or reassigned.
 - Push authentication and remote write access were verified by a successful push to `origin/main`.
 - Browser-based click-through, console inspection, and device-width visual checks were not available in this environment; the audit keeps those items pending.
+- `npm audit --omit=dev` found no production vulnerabilities. Full `npm audit` reports seven moderate advisories under `@typescript-eslint`'s nested `minimatch`; `npm audit fix` did not resolve them, and no breaking override was applied.
