@@ -12,15 +12,15 @@ export function CyberShieldProvider({ children }) {
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => {
     let saved = {};
-    try { saved = JSON.parse(localStorage.getItem('cybershield-state') || '{}'); } catch { /* Ignore malformed local browser data. */ }
+    try { const parsed = JSON.parse(localStorage.getItem('cybershield-state') || '{}'); if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) saved = parsed; } catch { /* Ignore malformed local browser data. */ }
     queueMicrotask(() => {
-      if (saved.answers && typeof saved.answers === 'object') {
+      if (saved.answers && typeof saved.answers === 'object' && !Array.isArray(saved.answers)) {
         const allowed = new Set(assessmentQuestions.map((question) => question.id));
         const validAnswers = Object.fromEntries(Object.entries(saved.answers).filter(([id, answer]) => allowed.has(id) && ['Yes', 'No', 'Not sure'].includes(answer)));
         setAnswers(validAnswers);
       }
-      if (saved.assessmentComplete === true) setAssessmentComplete(true);
-      if (Array.isArray(saved.checklist) && saved.checklist.length === 7) setChecklist(saved.checklist.map(Boolean));
+      if (saved.assessmentComplete === true && assessmentQuestions.every((question) => ['Yes', 'No', 'Not sure'].includes(saved.answers?.[question.id]))) setAssessmentComplete(true);
+      if (Array.isArray(saved.checklist) && saved.checklist.length === 7 && saved.checklist.every((item) => typeof item === 'boolean')) setChecklist(saved.checklist);
       setHydrated(true);
     });
   }, []);
@@ -33,7 +33,7 @@ export function CyberShieldProvider({ children }) {
   const toggleTask = useCallback((index) => setChecklist((prev) => prev.map((value, i) => i === index ? !value : value)), []);
   const resetChecklist = useCallback(() => setChecklist(emptyChecklist), []);
   const retakeAssessment = useCallback(() => { setAnswers({}); setAssessmentComplete(false); }, []);
-  const value = useMemo(() => ({ answers, setAnswer: (id, answer) => setAnswers((prev) => ({ ...prev, [id]: answer })), assessmentComplete, setAssessmentComplete, score, checklist, toggleTask, resetChecklist, completedCount, checklistProgress: Math.round(completedCount / 7 * 100), retakeAssessment }), [answers, assessmentComplete, score, checklist, toggleTask, resetChecklist, completedCount, retakeAssessment]);
+  const value = useMemo(() => ({ answers, setAnswer: (id, answer) => { if (assessmentQuestions.some((question) => question.id === id) && ['Yes', 'No', 'Not sure'].includes(answer)) setAnswers((prev) => ({ ...prev, [id]: answer })); }, assessmentComplete, setAssessmentComplete, score, checklist, toggleTask, resetChecklist, completedCount, checklistProgress: Math.round(completedCount / 7 * 100), retakeAssessment }), [answers, assessmentComplete, score, checklist, toggleTask, resetChecklist, completedCount, retakeAssessment]);
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export function useCyberShield() { const value = useContext(Context); if (!value) throw new Error('useCyberShield must be used inside CyberShieldProvider'); return value; }
