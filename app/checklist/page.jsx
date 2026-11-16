@@ -1,0 +1,3 @@
+import Link from 'next/link';
+import RecoveryChecklist from '../../src/components/RecoveryChecklist';
+export default function ChecklistPage() { return <div className="page-shell narrow-shell"><div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><Link href="/recovery">Recovery</Link><span>/</span><span>Checklist</span></div><div className="page-intro"><span className="eyebrow">A SIMPLE PLAN YOU CAN FOLLOW</span><h1>Your recovery <span>checklist.</span></h1><p>Work through these tasks on the affected account’s official website. Your progress is saved in this browser.</p></div><RecoveryChecklist /><p className="checklist-footnote">CyberShield never needs your account password, verification code, or recovery key.</p></div>; }
